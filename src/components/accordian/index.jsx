@@ -4,29 +4,63 @@ import "./styles.css";
 
 export default function Accordian() {
   const [selected, setSelected] = useState(null);
+  const [enableMultiSelection, setEnableMultiSelection] = useState(false);
+  const [multiple, setMultiple] = useState([]);
 
   function handleSingleSelection(getCurrectId) {
     setSelected(getCurrectId === selected ? null : getCurrectId);
   }
 
-  console.log(selected);
+  function handleMultiSelection(getCurrectId) {
+    let copyMultiple = [...multiple];
+    const findIndexOfCurrentId = copyMultiple.indexOf(getCurrectId);
+
+    console.log(findIndexOfCurrentId);
+
+    if (findIndexOfCurrentId === -1) {
+      copyMultiple.push(getCurrectId);
+    } else {
+      copyMultiple.splice(findIndexOfCurrentId, 1);
+    }
+
+    setMultiple(copyMultiple);
+  }
+
+  console.log(selected, multiple);
 
   return (
     <div className="acc-wrapper ">
+      <button onClick={() => setEnableMultiSelection(!enableMultiSelection)}>
+        Enable Multi Selection
+      </button>
       <div className="accordian">
         {data && data.length > 0 ? (
           data.map((dataItem) => (
             <div className="item">
               <div
-                onClick={() => handleSingleSelection(dataItem.id)}
+                onClick={
+                  enableMultiSelection
+                    ? () => handleMultiSelection(dataItem.id)
+                    : () => handleSingleSelection(dataItem.id)
+                }
                 className="title"
               >
                 <h3>{dataItem.question}</h3>
                 <span>+</span>
               </div>
-              {selected === dataItem.id ? (
+              {selected === dataItem.id ||
+              multiple.indexOf(dataItem.id) !== -1 ? (
                 <div className="acc-content">{dataItem.answer}</div>
               ) : null}
+
+              {/* different way */}
+              {/* {enableMultiSelection
+                ? multiple.indexOf(dataItem) !== -1 && (
+                    <div className="acc-content">{dataItem.answer}</div>
+                  )
+                : selected === dataItem.id && (
+                    <div className="acc-content">{dataItem.answer}</div>
+                  )} */}
             </div>
           ))
         ) : (
